@@ -124,6 +124,7 @@ import logging
 import sys
 
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from scrappers.scrapper import Scrapper
 from storages.file_storage import FileStorage
@@ -172,12 +173,62 @@ def stats_of_data():
     # Ask yourself what would you like to know about this data (most frequent word, or something else)
     
     df = pd.read_csv(TABLE_FORMAT_FILE)
+    
+    print("Lets print some technical data about data.")
     print("Data frame shape is: ")
+    
     print( df.shape)
+    
     print("Data frame columns are: ")
+    
     print(df.columns)
+    
     print("Data description: ")
+    
     print( df.describe() )
+    
+    print("")
+    print("We're going to explore the sun's coronal mass ejections, " )
+    print("details: https://en.wikipedia.org/wiki/Coronal_mass_ejection")
+    print("")
+    print("We can see that NASA experts divided all CME in different groups or types")
+    print("Lets understand it in figures.")
+    print("")
+    print("Calculate mean parameters of each type.")
+    print("First, all ocasions of each type:" )
+    
+    types = df.type.value_counts().to_dict()
+    for type__ in types:
+        print("CME type is ", type__, " , number of ocasions: ", types[type__], \
+              " and frequency is ", \
+              types[type__]/sum(types.values())*100, " percents." )
+        
+    print("")
+    print("We can see that S and C types are the most frequent,")
+    print("while O and R is near zero.")
+    print("")
+    print("Second, explore the mean and the median for each type")
+    
+    gr = df.groupby(['type'])[['speed', 'halfAngle']]
+    
+    print("Mean first")
+    print(gr.mean())
+    print("")
+    print("Median then")
+    print(gr.median())
+    print("")
+    print("We can see categories, each type differ by speed and angle")
+    print("Now lets make plot and show when the most significant CME (type R)" \
+          " occur")
+    print("")
+    
+    df['date'] = df["activityID"]
+    df['date'] = df['date'].apply( lambda x: ".".join( x.split('-')[0:2] ) )
+    plt.plot( df.groupby(['date'])[['type']].count() )
+    plt.title('Occurance of CME by time.')
+    plt.show()
+    
+
 
 if __name__ == '__main__':
     """
